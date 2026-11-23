@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ANAS — بوابة كورس Lua</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-void: #050507;
+            --bg-card: rgba(14, 15, 22, 0.92);
+            --crimson: #e11d48;
+            --crimson-soft: rgba(225, 29, 72, 0.16);
+            --crimson-glow: rgba(225, 29, 72, 0.38);
+            --gold: #fbbf24;
+            --gold-dark: #d97706;
+            --border-line: rgba(255, 255, 255, 0.08);
+            --border-crimson: rgba(225, 29, 72, 0.45);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: var(--bg-void);
+            background-image:
+                radial-gradient(circle at 50% 6%, rgba(225, 29, 72, 0.25), transparent 48%),
+                radial-gradient(circle at 85% 88%, rgba(251, 191, 36, 0.12), transparent 42%),
+                linear-gradient(180deg, rgba(5, 5, 7, 0.72) 0%, #050507 100%);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px 14px 34px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 430px;
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-crimson);
+            border-radius: 26px;
+            overflow: hidden;
+            box-shadow:
+                0 24px 60px rgba(0, 0, 0, 0.8),
+                0 0 38px var(--crimson-glow);
+            animation: popIn 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .banner {
+            position: relative;
+            height: 230px;
+            width: 100%;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-crimson);
+        }
+
+        .banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 20%;
+            filter: contrast(1.07) saturate(1.15);
+        }
+
+        .banner-layer {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(5, 5, 7, 0.15) 0%,
+                rgba(5, 5, 7, 0.56) 56%,
+                rgba(14, 15, 22, 0.98) 100%
+            );
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 14px 16px;
+        }
+
+        .top-badges {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .badge-brand {
+            background: rgba(5, 5, 7, 0.84);
+            border: 1px solid rgba(225, 29, 72, 0.55);
+            color: #fda4af;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 800;
+        }
+
+        .badge-user {
+            background: rgba(5, 5, 7, 0.84);
+            border: 1px solid var(--border-line);
+            color: var(--text-main);
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+
+        .banner-title .kicker {
+            display: inline-block;
+            color: var(--gold);
+            font-size: 0.78rem;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+
+        .banner-title h1 {
+            font-size: 1.58rem;
+            font-weight: 900;
+            line-height: 1.2;
+            text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
+        }
+
+        .body-wrap {
+            padding: 18px 20px 22px;
+        }
+
+        .intro {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            line-height: 1.65;
+            margin-bottom: 15px;
+        }
+
+        .price-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(90deg, var(--crimson-soft), rgba(251, 191, 36, 0.14));
+            border: 1px solid rgba(251, 191, 36, 0.35);
+            border-radius: 16px;
+            padding: 13px 16px;
+            margin-bottom: 16px;
+        }
+
+        .price-box .p-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .price-box .p-price {
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: var(--gold);
+        }
+
+        .points {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            margin-bottom: 20px;
+        }
+
+        .points li {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 0.88rem;
+            color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid var(--border-line);
+            border-radius: 12px;
+            padding: 9px 12px;
+        }
+
+        .points li .mark {
+            color: var(--crimson);
+            font-weight: 900;
+        }
+
+        .buy-btn {
+            width: 100%;
+            padding: 14px 16px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            color: #090a0f;
+            font-size: 1.02rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 10px 26px rgba(251, 191, 36, 0.28);
+            transition: transform 0.16s ease, opacity 0.16s ease;
+        }
+
+        .buy-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .buy-btn:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+
+        .note {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 0.76rem;
+            color: var(--text-sub);
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: translateY(18px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <section class="banner">
+            <img src="./1002654826.png" alt="ANAS">
+            <div class="banner-layer">
+                <div class="top-badges">
+                    <span class="badge-brand">ANAS • @A_B_XI</span>
+                    <span class="badge-user" id="userBadge">مرحباً بك</span>
+                </div>
+                <div class="banner-title">
+                    <span class="kicker">⚡ دخول مباشر بعد الدفع</span>
+                    <h1>كورس Lua الكامل</h1>
+                </div>
+            </div>
+        </section>
+
+        <section class="body-wrap">
+            <p class="intro">
+                احصل على وصول فوري إلى قناة كورس Lua الخاصة وجميع الدروس والملفات بمجرد إتمام الدفع بنجمة واحدة فقط.
+            </p>
+
+            <div class="price-box">
+                <span class="p-title">سعر الكورس</span>
+                <span class="p-price">1 نجمة ⭐</span>
+            </div>
+
+            <ul class="points">
+                <li><span class="mark">◆</span> رابط دعوة خاص ومباشر لقناة كورس Lua فور الدفع</li>
+                <li><span class="mark">◆</span> تفعيل آلي وسريع عبر بوت تيليجرام</li>
+                <li><span class="mark">◆</span> واجهة خفيفة ومصممة لتجربة واضحة ومريحة</li>
+            </ul>
+
+            <button class="buy-btn" id="buyBtn" onclick="startBuy()">شراء كورس Lua الآن — 1 نجمة ⭐</button>
+            <div class="note">الدفع الرسمي يتم عبر نجوم تيليجرام (XTR)</div>
+        </section>
+    </main>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        let sent = false;
+
+        tg.expand();
+        tg.ready();
+
+        if (tg.setHeaderColor) tg.setHeaderColor("#050507");
+        if (tg.setBackgroundColor) tg.setBackgroundColor("#050507");
+
+        const user = tg.initDataUnsafe?.user;
+        if (user && user.first_name) {
+            document.getElementById("userBadge").innerText = `أهلاً ${user.first_name}`;
+        }
+
+        function startBuy() {
+            if (sent) return;
+            sent = true;
+
+            const btn = document.getElementById("buyBtn");
+            btn.disabled = true;
+            btn.innerText = "جاري إرسال الفاتورة...";
+
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.notificationOccurred("success");
+            }
+
+            tg.sendData(JSON.stringify({
+                action: "buy_course",
+                course: "كورس Lua الكامل",
+                stars: 1,
+                initData: tg.initData || ""
+            }));
+        }
+    </script>
+</body>
+</html>
